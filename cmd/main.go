@@ -13,7 +13,6 @@ import (
 	"github.com/asxcandrew/galas/storage"
 	"github.com/asxcandrew/galas/user"
 	"github.com/go-kit/kit/log"
-	"github.com/go-pg/pg"
 )
 
 func main() {
@@ -31,7 +30,7 @@ func main() {
 		errs <- err
 	}
 
-	db := initPGConnection(
+	db := storage.InitPGConnection(
 		appConfig.DB.Host,
 		appConfig.DB.Port,
 		appConfig.DB.User,
@@ -69,18 +68,4 @@ func main() {
 	defer func() {
 		db.Close()
 	}()
-}
-
-func initPGConnection(host, port, username, password, name string) (db *pg.DB) {
-	options := pg.Options{
-		Addr:     fmt.Sprintf("%s:%s", host, port),
-		User:     username,
-		Password: password,
-		Database: name,
-	}
-	// if c.TLS {
-	// 	options.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-	// }
-	db = pg.Connect(&options)
-	return db
 }
