@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
+
+	"github.com/asxcandrew/galas/api/representation"
 
 	"github.com/asxcandrew/galas/api/endpoint"
 	"github.com/asxcandrew/galas/item"
@@ -28,11 +31,29 @@ func MakeItemHandler(s item.ItemService, logger log.Logger) http.Handler {
 		opts...,
 	)
 
+	createItemHandler := kithttp.NewServer(
+		endpoint.MakeCreateItemEndpoint(s),
+		decodeCreateItemRequest,
+		encodeResponse,
+		opts...,
+	)
+
 	r := mux.NewRouter()
 
 	r.Handle("/api/v1/p/item/{id}", showItemHandler).Methods("GET")
+	r.Handle("/api/v1/p/item/", createItemHandler).Methods("POST")
 
 	return r
+}
+
+func decodeCreateItemRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var body = representation.ItemEntity{}
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		return nil, err
+	}
+
+	return endpoint.CreateItemRequest{Data: &body}, nil
 }
 
 func decodeShowItemRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -41,20 +62,28 @@ func decodeShowItemRequest(_ context.Context, r *http.Request) (interface{}, err
 	if !ok {
 		return nil, errBadRoute
 	}
-	return endpoint.ShowItemRequest{ID: id}, nil
+
+	i, err := strconv.Atoi(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return endpoint.ShowItemRequest{ID: i}, nil
 }
 
 func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
-	if e, ok := response.(errorer); ok && e.error() != nil {
-		encodeError(ctx, e.error(), w)
-		return nil
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	return json.NewEncoder(w).Encode(response)
-}
+	if r, ok := response.(representation.Resp); ok {
+		if r.GetError() != nil {
+			encodeError(ctx, r.GetError(), w)
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-type errorer interface {
-	error() error
+		return json.NewEncoder(w).Encode(map[string]interface{}{
+			"data": r.GetData(),
+		})
+	}
+	return errors.New("Bad request")
 }
 
 // encode errors from business-logic

@@ -1,6 +1,7 @@
 package pg
 
 import (
+	"github.com/asxcandrew/galas/storage/model"
 	"github.com/go-pg/pg"
 )
 
@@ -12,4 +13,20 @@ func NewPGItemRepository(db *pg.DB) *ItemRepository {
 	return &ItemRepository{
 		db: db,
 	}
+}
+
+func (r *ItemRepository) GetByID(id int) (item *model.Item, err error) {
+	item = &model.Item{ID: id}
+	err = r.db.Select(item)
+
+	return item, err
+}
+
+func (r *ItemRepository) Create(item *model.Item) (err error) {
+	err = r.db.Insert(item)
+
+	if err != nil {
+		return err
+	}
+	return err
 }
