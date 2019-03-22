@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/asxcandrew/galas/workers"
+
 	"github.com/asxcandrew/galas/api/transport"
 	"github.com/asxcandrew/galas/config"
 	"github.com/asxcandrew/galas/item"
@@ -45,11 +47,14 @@ func main() {
 	is = item.NewItemLoggingService(logger, is)
 	us = user.NewUserLoggingService(logger, us)
 
+	ah := workers.NewAuthWorker(&us, &st)
+
 	httpLogger := log.With(logger, "component", "http")
 	mux := http.NewServeMux()
 
-	mux.Handle("/api/v1/p/user/", transport.MakeUserHandler(us, httpLogger))
-	mux.Handle("/api/v1/p/item/", transport.MakeItemHandler(is, httpLogger))
+	mux.Handle("/api/v1/user/", transport.MakeUserHandler(us, httpLogger))
+	mux.Handle("/api/v1/item/", transport.MakeItemHandler(is, httpLogger))
+	mux.Handle("/api/v1/auth/", transport.MakeAuthHandler(ah, httpLogger))
 
 	http.Handle("/", mux)
 

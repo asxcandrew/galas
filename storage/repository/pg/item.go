@@ -23,10 +23,5 @@ func (r *ItemRepository) GetByID(id int) (item *model.Item, err error) {
 }
 
 func (r *ItemRepository) Create(item *model.Item) (err error) {
-	err = r.db.Insert(item)
-
-	if err != nil {
-		return err
-	}
-	return err
+	return create(r.db, item)
 }
