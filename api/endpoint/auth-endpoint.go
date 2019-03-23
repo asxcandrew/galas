@@ -28,21 +28,28 @@ type AuthResponse struct {
 	Expire string                     `json:"expire"`
 }
 
-func MakeLoginEndpoint(h workers.AuthWorker) endpoint.Endpoint {
+func MakeLoginEndpoint(w workers.AuthWorker) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(LoginRequest)
-		user, err := h.Login(req.Email, req.Password)
+		user, err := w.Login(req.Email, req.Password)
+
+		if err != nil {
+			return nil, nil
+		}
+
+		token, expire, err := w.GenerateToken(user)
+
 		resp := representation.Resp{
 			Err: err,
 		}
 		if err == nil {
-			resp.Data = buildAuthResponse(user)
+			resp.Data = buildAuthResponse(user, token, expire)
 		}
 		return resp, err
 	}
 }
 
-func MakeRegisterEndpoint(h workers.AuthWorker) endpoint.Endpoint {
+func MakeRegisterEndpoint(w workers.AuthWorker) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(RegisterRequest)
 		user := &model.User{
@@ -50,26 +57,32 @@ func MakeRegisterEndpoint(h workers.AuthWorker) endpoint.Endpoint {
 			Username: req.Username,
 			Role:     model.UserRole_Plebs,
 		}
-		err := h.Register(user, req.Password)
+		err := w.Register(user, req.Password)
+
+		if err != nil {
+			return nil, nil
+		}
+
+		token, expire, err := w.GenerateToken(user)
 
 		resp := representation.Resp{
 			Err: err,
 		}
 		if err == nil {
-			resp.Data = buildAuthResponse(user)
+			resp.Data = buildAuthResponse(user, token, expire)
 		}
 		return resp, err
 	}
 }
 
-func buildAuthResponse(user *model.User) *AuthResponse {
+func buildAuthResponse(user *model.User, token string, expire time.Time) *AuthResponse {
 	return &AuthResponse{
 		User: &representation.UserEntity{
 			Username:  user.Username,
 			CreatedAt: user.CreatedAt,
 			About:     user.About,
 		},
-		Token:  "token",
-		Expire: time.Now().Format(time.RFC3339),
+		Token:  token,
+		Expire: expire.Format(time.RFC3339),
 	}
 }

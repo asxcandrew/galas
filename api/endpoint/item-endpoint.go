@@ -5,6 +5,7 @@ import (
 
 	"github.com/asxcandrew/galas/api/representation"
 	"github.com/asxcandrew/galas/item"
+	"github.com/asxcandrew/galas/workers"
 	"github.com/go-kit/kit/endpoint"
 )
 
@@ -32,7 +33,15 @@ func MakeShowItemEndpoint(s item.ItemService) endpoint.Endpoint {
 
 func MakeCreateItemEndpoint(s item.ItemService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
+
+		claims, err := workers.GetClaims(ctx)
+
+		if err != nil {
+			return nil, err
+		}
+
 		req := request.(CreateItemRequest)
+		req.Data.AuthorID = claims.UserID
 		item, err := s.Create(req.Data)
 
 		resp := representation.Resp{

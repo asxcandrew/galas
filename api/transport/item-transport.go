@@ -11,6 +11,8 @@ import (
 
 	"github.com/asxcandrew/galas/api/endpoint"
 	"github.com/asxcandrew/galas/item"
+	"github.com/asxcandrew/galas/workers"
+	gokitjwt "github.com/go-kit/kit/auth/jwt"
 	"github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
@@ -18,7 +20,7 @@ import (
 
 var errBadRoute = errors.New("bad route")
 
-func MakeItemHandler(s item.ItemService, logger log.Logger) http.Handler {
+func MakeItemHandler(s item.ItemService, w workers.AuthWorker, logger log.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerErrorEncoder(encodeError),
@@ -32,10 +34,10 @@ func MakeItemHandler(s item.ItemService, logger log.Logger) http.Handler {
 	)
 
 	createItemHandler := kithttp.NewServer(
-		endpoint.MakeCreateItemEndpoint(s),
+		w.NewJWTParser(endpoint.MakeCreateItemEndpoint(s)),
 		decodeCreateItemRequest,
 		encodeResponse,
-		opts...,
+		append(opts, kithttp.ServerBefore(gokitjwt.HTTPToContext()))...,
 	)
 
 	r := mux.NewRouter()
@@ -46,7 +48,7 @@ func MakeItemHandler(s item.ItemService, logger log.Logger) http.Handler {
 	return r
 }
 
-func decodeCreateItemRequest(_ context.Context, r *http.Request) (interface{}, error) {
+func decodeCreateItemRequest(c context.Context, r *http.Request) (interface{}, error) {
 	var body = representation.ItemEntity{}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {

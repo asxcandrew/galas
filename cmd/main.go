@@ -47,14 +47,14 @@ func main() {
 	is = item.NewItemLoggingService(logger, is)
 	us = user.NewUserLoggingService(logger, us)
 
-	ah := workers.NewAuthWorker(&us, &st)
+	aw := workers.NewAuthWorker(&us, &st, appConfig.SecretSeed)
 
 	httpLogger := log.With(logger, "component", "http")
 	mux := http.NewServeMux()
 
 	mux.Handle("/api/v1/user/", transport.MakeUserHandler(us, httpLogger))
-	mux.Handle("/api/v1/item/", transport.MakeItemHandler(is, httpLogger))
-	mux.Handle("/api/v1/auth/", transport.MakeAuthHandler(ah, httpLogger))
+	mux.Handle("/api/v1/item/", transport.MakeItemHandler(is, aw, httpLogger))
+	mux.Handle("/api/v1/auth/", transport.MakeAuthHandler(aw, httpLogger))
 
 	http.Handle("/", mux)
 

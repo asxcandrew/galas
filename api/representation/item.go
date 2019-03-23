@@ -23,6 +23,7 @@ func ConvertItemModelToEntity(m *model.Item) *ItemEntity {
 	return &ItemEntity{
 		ID:        m.ID,
 		Link:      m.Link,
+		AuthorID:  m.AuthorID,
 		HTMLBody:  m.HTMLBody,
 		Title:     m.Title,
 		Type:      m.Type,

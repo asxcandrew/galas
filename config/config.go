@@ -7,7 +7,8 @@ import (
 )
 
 type galasConfiguration struct {
-	DB *databaseConfiguration
+	DB         *databaseConfiguration
+	SecretSeed string `required:"true"`
 }
 
 type databaseConfiguration struct {
