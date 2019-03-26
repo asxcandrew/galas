@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/asxcandrew/galas/api/representation"
 )
@@ -33,4 +34,23 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"error": err.Error(),
 	})
+}
+
+func getPage(r *http.Request) int {
+	p, ok := r.URL.Query()["page"]
+
+	if !ok {
+		return 0
+	}
+
+	if len(p[0]) > 0 {
+		page, err := strconv.Atoi(p[0])
+
+		if err != nil {
+			return 0
+		}
+		return page
+	}
+
+	return 0
 }

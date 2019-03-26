@@ -85,7 +85,10 @@ func decodeFeedRequest(_ context.Context, r *http.Request) (interface{}, error) 
 	if !ok {
 		return nil, errBadRoute
 	}
-	return endpoint.FeedRequest{Type: t}, nil
+
+	page := getPage(r)
+
+	return endpoint.FeedRequest{Type: t, Page: page}, nil
 }
 
 func decodeShowItemRequest(_ context.Context, r *http.Request) (interface{}, error) {
