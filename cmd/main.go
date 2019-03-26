@@ -52,8 +52,9 @@ func main() {
 	httpLogger := log.With(logger, "component", "http")
 	mux := http.NewServeMux()
 
-	mux.Handle("/api/v1/user/", transport.MakeUserHandler(us, httpLogger))
-	mux.Handle("/api/v1/item/", transport.MakeItemHandler(is, aw, httpLogger))
+	mux.Handle("/api/v1/users/", transport.MakeUserHandler(us, httpLogger))
+	mux.Handle("/api/v1/items/", transport.MakeItemHandler(is, aw, httpLogger))
+	mux.Handle("/api/v1/feed/", transport.MakeFeedHandler(is, aw, httpLogger))
 	mux.Handle("/api/v1/auth/", transport.MakeAuthHandler(aw, httpLogger))
 
 	http.Handle("/", mux)

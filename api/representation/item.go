@@ -14,7 +14,7 @@ type ItemEntity struct {
 	Type       string    `json:"type"`
 	Score      int       `json:"score"`
 	AncestorID int       `json:"ancestor_id"`
-	AuthorID   int       `json:"author_id"`
+	Author     string    `json:"author"`
 	Active     bool      `json:"active"`
 	CreatedAt  time.Time `json:"created_at"`
 }
@@ -23,11 +23,21 @@ func ConvertItemModelToEntity(m *model.Item) *ItemEntity {
 	return &ItemEntity{
 		ID:        m.ID,
 		Link:      m.Link,
-		AuthorID:  m.AuthorID,
+		Author:    m.Author.Username,
 		HTMLBody:  m.HTMLBody,
 		Title:     m.Title,
 		Type:      m.Type,
 		Score:     m.Score,
+		Active:    m.Active,
 		CreatedAt: m.CreatedAt,
 	}
+}
+
+func ConvertItemsListModelToEntity(items []*model.Item) []*ItemEntity {
+	list := make([]*ItemEntity, len(items))
+
+	for i, item := range items {
+		list[i] = ConvertItemModelToEntity(item)
+	}
+	return list
 }

@@ -18,7 +18,7 @@ func init() {
 												author_id int REFERENCES users(id),
 												ancestor_id int REFERENCES items(id),
 												score int,
-												active boolean,
+												active boolean DEFAULT TRUE,
 												updated_at timestamptz DEFAULT current_timestamp,
 												created_at timestamptz DEFAULT current_timestamp
 											)

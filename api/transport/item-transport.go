@@ -18,7 +18,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var errBadRoute = errors.New("bad route")
+var errBadRoute = errors.New("Bad route")
 
 func MakeItemHandler(s item.ItemService, w workers.AuthWorker, logger log.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
@@ -42,13 +42,33 @@ func MakeItemHandler(s item.ItemService, w workers.AuthWorker, logger log.Logger
 
 	r := mux.NewRouter()
 
-	r.Handle("/api/v1/item/{id}", showItemHandler).Methods("GET")
-	r.Handle("/api/v1/item/", createItemHandler).Methods("POST")
+	r.Handle("/api/v1/items/{id}", showItemHandler).Methods("GET")
+	r.Handle("/api/v1/items/", createItemHandler).Methods("POST")
 
 	return r
 }
 
-func decodeCreateItemRequest(c context.Context, r *http.Request) (interface{}, error) {
+func MakeFeedHandler(s item.ItemService, w workers.AuthWorker, logger log.Logger) http.Handler {
+	opts := []kithttp.ServerOption{
+		kithttp.ServerErrorLogger(logger),
+		kithttp.ServerErrorEncoder(encodeError),
+	}
+
+	newStoriesHandler := kithttp.NewServer(
+		endpoint.MakeFeedEndpoint(s),
+		decodeFeedRequest,
+		encodeResponse,
+		opts...,
+	)
+
+	r := mux.NewRouter()
+
+	r.Handle("/api/v1/feed/{type}", newStoriesHandler).Methods("GET")
+
+	return r
+}
+
+func decodeCreateItemRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var body = representation.ItemEntity{}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -56,6 +76,16 @@ func decodeCreateItemRequest(c context.Context, r *http.Request) (interface{}, e
 	}
 
 	return endpoint.CreateItemRequest{Data: &body}, nil
+}
+
+func decodeFeedRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	t, ok := vars["type"]
+
+	if !ok {
+		return nil, errBadRoute
+	}
+	return endpoint.FeedRequest{Type: t}, nil
 }
 
 func decodeShowItemRequest(_ context.Context, r *http.Request) (interface{}, error) {

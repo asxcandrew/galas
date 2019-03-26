@@ -8,7 +8,8 @@ import (
 
 type ItemService interface {
 	Get(int) (*model.Item, error)
-	Create(*representation.ItemEntity) (*model.Item, error)
+	ListNew(int) ([]*model.Item, error)
+	Create(*representation.ItemEntity, int) (*model.Item, error)
 }
 
 type itemService struct {
@@ -28,24 +29,35 @@ func (s *itemService) Get(itemID int) (item *model.Item, err error) {
 	return item, err
 }
 
-func (s *itemService) Create(item *representation.ItemEntity) (*model.Item, error) {
-	model := &model.Item{
+func (s *itemService) ListNew(page int) ([]*model.Item, error) {
+	st, e := s.storage.Item.GetNewStories(page)
+	return st, e
+}
+
+func (s *itemService) Create(item *representation.ItemEntity, authorID int) (*model.Item, error) {
+	i := &model.Item{
 		Link:       item.Link,
 		Score:      0,
 		HTMLBody:   item.HTMLBody,
 		Title:      item.Title,
 		Type:       item.Type,
 		AncestorID: item.AncestorID,
-		AuthorID:   item.AuthorID,
+		AuthorID:   authorID,
 		Active:     true,
 	}
-	err := model.Validate()
+	err := i.Validate()
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.storage.Item.Create(model)
+	err = s.storage.Item.Create(i)
 
-	return model, err
+	if err != nil {
+		return nil, err
+	}
+
+	i, err = s.storage.Item.GetByID(i.ID)
+
+	return i, err
 }
