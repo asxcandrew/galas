@@ -9,6 +9,7 @@ import (
 type ItemService interface {
 	Get(int) (*model.Item, error)
 	ListNew(int) ([]*model.Item, error)
+	ListTop(int) ([]*model.Item, error)
 	Create(*representation.ItemEntity, int) (*model.Item, error)
 }
 
@@ -31,6 +32,11 @@ func (s *itemService) Get(itemID int) (item *model.Item, err error) {
 
 func (s *itemService) ListNew(page int) ([]*model.Item, error) {
 	st, e := s.storage.Item.GetNewStories(page)
+	return st, e
+}
+
+func (s *itemService) ListTop(page int) ([]*model.Item, error) {
+	st, e := s.storage.Item.GetTopStories(page)
 	return st, e
 }
 

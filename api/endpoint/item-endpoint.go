@@ -14,6 +14,7 @@ import (
 
 const (
 	ListType_New = "new"
+	ListType_Top = "top"
 )
 
 type ShowItemRequest struct {
@@ -38,6 +39,8 @@ func MakeFeedEndpoint(s item.ItemService) endpoint.Endpoint {
 		switch req.Type {
 		case ListType_New:
 			items, err = s.ListNew(req.Page)
+		case ListType_Top:
+			items, err = s.ListTop(req.Page)
 		default:
 			err = errors.New("Bad request")
 		}
