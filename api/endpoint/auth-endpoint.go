@@ -77,11 +77,7 @@ func MakeRegisterEndpoint(w workers.AuthWorker) endpoint.Endpoint {
 
 func buildAuthResponse(user *model.User, token string, expire time.Time) *AuthResponse {
 	return &AuthResponse{
-		User: &representation.UserEntity{
-			Username:  user.Username,
-			CreatedAt: user.CreatedAt,
-			About:     user.About,
-		},
+		User:   representation.ConvertUserModelToEntity(user),
 		Token:  token,
 		Expire: expire.Format(time.RFC3339),
 	}

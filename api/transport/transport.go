@@ -3,9 +3,10 @@ package transport
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
+
+	"github.com/asxcandrew/galas/errors"
 
 	"github.com/asxcandrew/galas/api/representation"
 )
@@ -16,18 +17,19 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 			encodeError(ctx, r.GetError(), w)
 		}
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
 		return json.NewEncoder(w).Encode(map[string]interface{}{
-			"data": r.GetData(),
+			"payload": r.GetData(),
 		})
 	}
-	return errors.New("Bad request")
+	return errors.BadRequestError
 }
 
 // encode errors from business-logic
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	switch err {
+	case errors.NotFoundError:
+		w.WriteHeader(http.StatusNotFound)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 	}

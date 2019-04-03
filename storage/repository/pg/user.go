@@ -25,3 +25,10 @@ func (r *UserRepository) GetByEmail(email string) (*model.User, error) {
 
 	return user, err
 }
+
+func (r *UserRepository) GetByUsername(username string) (*model.User, error) {
+	user := &model.User{}
+	err := r.db.Model(user).Where("username = ?", username).Select()
+
+	return user, wrapError(err)
+}

@@ -1,13 +1,14 @@
 package pg
 
 import (
+	"github.com/asxcandrew/galas/errors"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/go-pg/pg/urlvalues"
 )
 
 const (
-	PerPage = 20
+	PerPage = 10
 )
 
 func newPager(page int) *urlvalues.Pager {
@@ -28,4 +29,13 @@ func paginate(q *orm.Query, page int) (*orm.Query, error) {
 	p := newPager(page)
 
 	return p.Pagination(q)
+}
+
+func wrapError(err error) error {
+	switch err {
+	case pg.ErrNoRows:
+		return errors.NotFoundError
+	default:
+		return err
+	}
 }
