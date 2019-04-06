@@ -10,6 +10,7 @@ import (
 	"github.com/asxcandrew/galas/workers"
 
 	"github.com/asxcandrew/galas/api/transport"
+	"github.com/asxcandrew/galas/bookmark"
 	"github.com/asxcandrew/galas/config"
 	"github.com/asxcandrew/galas/item"
 	"github.com/asxcandrew/galas/storage"
@@ -43,9 +44,11 @@ func main() {
 	st := storage.NewPGStorage(db)
 	us := user.NewUserService(st)
 	is := item.NewItemService(st)
+	bs := bookmark.NewBookmarkService(st)
 
 	is = item.NewItemLoggingService(logger, is)
 	us = user.NewUserLoggingService(logger, us)
+	bs = bookmark.NewBookmarkLoggingService(logger, bs)
 
 	aw := workers.NewAuthWorker(&us, &st, appConfig.SecretSeed)
 
@@ -54,6 +57,7 @@ func main() {
 
 	mux.Handle("/api/v1/users/", transport.MakeUserHandler(us, httpLogger))
 	mux.Handle("/api/v1/items/", transport.MakeItemHandler(is, aw, httpLogger))
+	mux.Handle("/api/v1/bookmarks/", transport.MakeBookmarkHandler(bs, aw, httpLogger))
 	mux.Handle("/api/v1/feed/", transport.MakeFeedHandler(is, aw, httpLogger))
 	mux.Handle("/api/v1/auth/", transport.MakeAuthHandler(aw, httpLogger))
 

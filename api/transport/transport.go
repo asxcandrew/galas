@@ -30,6 +30,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	switch err {
 	case errors.NotFoundError:
 		w.WriteHeader(http.StatusNotFound)
+	case errors.ForbiddenError:
+		w.WriteHeader(http.StatusForbidden)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 	}

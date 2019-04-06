@@ -7,13 +7,15 @@ import (
 )
 
 type Storage struct {
-	Item repository.ItemRepository
-	User repository.UserRepository
+	Item     repository.ItemRepository
+	User     repository.UserRepository
+	Bookmark repository.BookmarkRepository
 }
 
 func NewPGStorage(db *pg.DB) Storage {
 	return Storage{
-		Item: pgrepository.NewPGItemRepository(db),
-		User: pgrepository.NewPGUserRepository(db),
+		Item:     pgrepository.NewPGItemRepository(db),
+		User:     pgrepository.NewPGUserRepository(db),
+		Bookmark: pgrepository.NewPGBookmarkRepository(db),
 	}
 }
