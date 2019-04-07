@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/asxcandrew/galas/storage/model"
+	"github.com/asxcandrew/galas/user"
 
 	"github.com/asxcandrew/galas/api/representation"
 	"github.com/asxcandrew/galas/workers"
@@ -28,10 +29,10 @@ type AuthResponse struct {
 	Expire string                     `json:"expire"`
 }
 
-func MakeLoginEndpoint(w workers.AuthWorker) endpoint.Endpoint {
+func MakeLoginEndpoint(w workers.AuthWorker, s user.UserService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(LoginRequest)
-		user, err := w.Login(req.Email, req.Password)
+		user, err := s.Login(req.Email, req.Password)
 
 		if err != nil {
 			return nil, nil
@@ -49,7 +50,7 @@ func MakeLoginEndpoint(w workers.AuthWorker) endpoint.Endpoint {
 	}
 }
 
-func MakeRegisterEndpoint(w workers.AuthWorker) endpoint.Endpoint {
+func MakeRegisterEndpoint(w workers.AuthWorker, s user.UserService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(RegisterRequest)
 		user := &model.User{
@@ -57,7 +58,7 @@ func MakeRegisterEndpoint(w workers.AuthWorker) endpoint.Endpoint {
 			Username: req.Username,
 			Role:     model.UserRole_Plebs,
 		}
-		err := w.Register(user, req.Password)
+		err := s.Register(user, req.Password)
 
 		if err != nil {
 			return nil, nil

@@ -24,7 +24,7 @@ func (r *BookmarkRepository) List(userID, page int) ([]*model.Bookmark, error) {
 	var bookmarks []*model.Bookmark
 
 	q := r.db.Model(&bookmarks)
-	q.Where("user_id = ?", userID).Column("Item")
+	q.Where("user_id = ?", userID).Column("Item", "Item.Author")
 
 	q, err := paginate(q, page)
 
@@ -32,7 +32,9 @@ func (r *BookmarkRepository) List(userID, page int) ([]*model.Bookmark, error) {
 		return bookmarks, wrapError(err)
 	}
 
-	return bookmarks, nil
+	err = q.Select()
+
+	return bookmarks, wrapError(err)
 }
 
 func (r *BookmarkRepository) Delete(ID int) error {

@@ -1,9 +1,10 @@
 package faults
 
 const (
-	NotFoundError   = "Not found"
-	ForbiddenError  = "Forbidden action"
-	BadRequestError = "Bad request"
+	NotFoundError     = "Not found"
+	ForbiddenError    = "Forbidden action"
+	UnauthorisedError = "Unauthorised action"
+	BadRequestError   = "Bad request"
 )
 
 type RichError struct {

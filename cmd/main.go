@@ -50,7 +50,7 @@ func main() {
 	us = user.NewUserLoggingService(logger, us)
 	bs = bookmark.NewBookmarkLoggingService(logger, bs)
 
-	aw := workers.NewAuthWorker(&us, &st, appConfig.SecretSeed)
+	aw := workers.NewAuthWorker(appConfig.SecretSeed)
 
 	httpLogger := log.With(logger, "component", "http")
 	mux := http.NewServeMux()
@@ -59,7 +59,7 @@ func main() {
 	mux.Handle("/api/v1/items/", transport.MakeItemHandler(is, aw, httpLogger))
 	mux.Handle("/api/v1/bookmarks/", transport.MakeBookmarkHandler(bs, aw, httpLogger))
 	mux.Handle("/api/v1/feed/", transport.MakeFeedHandler(is, aw, httpLogger))
-	mux.Handle("/api/v1/auth/", transport.MakeAuthHandler(aw, httpLogger))
+	mux.Handle("/api/v1/auth/", transport.MakeAuthHandler(us, aw, httpLogger))
 
 	http.Handle("/", mux)
 

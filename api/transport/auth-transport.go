@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/asxcandrew/galas/user"
 	"github.com/asxcandrew/galas/workers"
 
 	"github.com/asxcandrew/galas/api/endpoint"
@@ -13,21 +14,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func MakeAuthHandler(w workers.AuthWorker, logger log.Logger) http.Handler {
+func MakeAuthHandler(s user.UserService, w workers.AuthWorker, logger log.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerErrorEncoder(encodeError),
 	}
 
 	loginHandler := kithttp.NewServer(
-		endpoint.MakeLoginEndpoint(w),
+		endpoint.MakeLoginEndpoint(w, s),
 		decodeLoginRequest,
 		encodeResponse,
 		opts...,
 	)
 
 	registerHandler := kithttp.NewServer(
-		endpoint.MakeRegisterEndpoint(w),
+		endpoint.MakeRegisterEndpoint(w, s),
 		decodeRegisterRequest,
 		encodeResponse,
 		opts...,
