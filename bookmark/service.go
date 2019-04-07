@@ -37,9 +37,19 @@ func (s *bookmarkService) Create(itemID int, userID int, comment string) (*model
 	}
 	err := s.storage.Bookmark.Create(bookmark)
 
-	bookmark, err = s.storage.Bookmark.GetByID(bookmark.ID)
+	if err != nil {
+		return nil, err
+	}
 
-	return bookmark, err
+	item, err := s.storage.Item.GetByID(itemID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	bookmark.Item = item
+
+	return bookmark, nil
 }
 
 func (s *bookmarkService) Delete(bookmarkID int) error {

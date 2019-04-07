@@ -3,13 +3,14 @@ package transport
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
 	"github.com/asxcandrew/galas/bookmark"
+	"github.com/asxcandrew/galas/faults"
 
 	"github.com/asxcandrew/galas/api/endpoint"
-	"github.com/asxcandrew/galas/errors"
 	"github.com/asxcandrew/galas/workers"
 	gokitjwt "github.com/go-kit/kit/auth/jwt"
 	"github.com/go-kit/kit/log"
@@ -69,7 +70,7 @@ func decodeDeleteBookmarkRequest(_ context.Context, r *http.Request) (interface{
 	val, ok := vars["id"]
 
 	if !ok {
-		return nil, errors.BadRequestError
+		return nil, errors.New(faults.BadRequestError)
 	}
 
 	i, err := strconv.Atoi(val)
@@ -84,5 +85,5 @@ func decodeDeleteBookmarkRequest(_ context.Context, r *http.Request) (interface{
 func decodeListBookmarksRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	page := getPage(r)
 
-	return endpoint.FeedRequest{Page: page}, nil
+	return endpoint.ListBookmarksRequest{Page: page}, nil
 }

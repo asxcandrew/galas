@@ -16,7 +16,8 @@ func NewPGBookmarkRepository(db *pg.DB) *BookmarkRepository {
 }
 
 func (r *BookmarkRepository) Create(b *model.Bookmark) error {
-	return create(r.db, b)
+	err := create(r.db, b)
+	return wrapError(err)
 }
 
 func (r *BookmarkRepository) List(userID, page int) ([]*model.Bookmark, error) {
@@ -28,10 +29,10 @@ func (r *BookmarkRepository) List(userID, page int) ([]*model.Bookmark, error) {
 	q, err := paginate(q, page)
 
 	if err != nil {
-		return bookmarks, err
+		return bookmarks, wrapError(err)
 	}
 
-	return bookmarks, err
+	return bookmarks, nil
 }
 
 func (r *BookmarkRepository) Delete(ID int) error {
@@ -42,8 +43,8 @@ func (r *BookmarkRepository) Delete(ID int) error {
 }
 
 func (r *BookmarkRepository) GetByID(ID int) (*model.Bookmark, error) {
-	b := &model.Bookmark{ID: ID}
-	err := r.db.Select(b)
+	b := &model.Bookmark{}
+	err := r.db.Model(b).Where("bookmark.id = ?", ID).Column("Item").Select()
 
 	return b, wrapError(err)
 }

@@ -14,5 +14,6 @@ type Bookmark struct {
 	ItemID    int
 	Item      *Item
 	Comment   string
+	UpdatedAt time.Time
 	CreatedAt time.Time
 }

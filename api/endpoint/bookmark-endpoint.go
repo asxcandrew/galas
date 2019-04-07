@@ -2,10 +2,11 @@ package endpoint
 
 import (
 	"context"
+	"errors"
 
 	"github.com/asxcandrew/galas/api/representation"
 	"github.com/asxcandrew/galas/bookmark"
-	"github.com/asxcandrew/galas/errors"
+	"github.com/asxcandrew/galas/faults"
 	"github.com/asxcandrew/galas/workers"
 	"github.com/go-kit/kit/endpoint"
 )
@@ -78,11 +79,19 @@ func MakeDeleteBookmarkEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 		req := request.(DeleteBookmarkRequest)
 		bookmark, err := s.GetByID(req.ID)
 
+		if err != nil {
+			return nil, err
+		}
+
 		if bookmark.UserID != claims.UserID {
-			return nil, errors.ForbiddenError
+			return nil, faults.BuildRichError(faults.ForbiddenError, errors.New("User is forbidden to delete bookmark"))
 		}
 		err = s.Delete(req.ID)
 
-		return nil, err
+		resp := representation.Resp{
+			Err: err,
+		}
+
+		return resp, err
 	}
 }

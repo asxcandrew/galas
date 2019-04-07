@@ -15,7 +15,8 @@ func init() {
 												user_id int REFERENCES users(id),
 												item_id int REFERENCES items(id),
 												updated_at timestamptz DEFAULT current_timestamp,
-												created_at timestamptz DEFAULT current_timestamp
+												created_at timestamptz DEFAULT current_timestamp,
+												CONSTRAINT unq_user_id_item_id UNIQUE(user_id,item_id)
 											)
 		`)
 		return err

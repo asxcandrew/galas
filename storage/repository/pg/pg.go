@@ -1,7 +1,7 @@
 package pg
 
 import (
-	"github.com/asxcandrew/galas/errors"
+	"github.com/asxcandrew/galas/faults"
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/go-pg/pg/urlvalues"
@@ -31,11 +31,17 @@ func paginate(q *orm.Query, page int) (*orm.Query, error) {
 	return p.Pagination(q)
 }
 
-func wrapError(err error) error {
+func wrapError(err error) faults.IRichError {
+	if err == nil {
+		return nil
+	}
+
 	switch err {
 	case pg.ErrNoRows:
-		return errors.NotFoundError
+		return faults.BuildRichError(faults.NotFoundError, err)
+	case pg.ErrMultiRows:
+		return faults.BuildRichError(faults.NotFoundError, err)
 	default:
-		return err
+		return faults.BuildRichError(faults.NotFoundError, err)
 	}
 }
