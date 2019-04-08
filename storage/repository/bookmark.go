@@ -5,7 +5,7 @@ import (
 )
 
 type BookmarkRepository interface {
-	List(userID, page int) ([]*model.Bookmark, error)
+	ListAndCount(userID, page int) ([]*model.Bookmark, int, error)
 	Delete(int) error
 	GetByID(int) (*model.Bookmark, error)
 	Create(*model.Bookmark) error

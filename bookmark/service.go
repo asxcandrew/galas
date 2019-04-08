@@ -6,7 +6,7 @@ import (
 )
 
 type BookmarkService interface {
-	List(int, int) ([]*model.Bookmark, error)
+	List(int, int) ([]*model.Bookmark, int, error)
 	Create(int, int, string) (*model.Bookmark, error)
 	Delete(int) error
 	GetByID(int) (*model.Bookmark, error)
@@ -23,10 +23,10 @@ func NewBookmarkService(storage storage.Storage) BookmarkService {
 	}
 }
 
-func (s *bookmarkService) List(userID, page int) ([]*model.Bookmark, error) {
-	bookmarks, err := s.storage.Bookmark.List(userID, page)
+func (s *bookmarkService) List(userID, page int) ([]*model.Bookmark, int, error) {
+	bookmarks, count, err := s.storage.Bookmark.ListAndCount(userID, page)
 
-	return bookmarks, err
+	return bookmarks, count, err
 }
 
 func (s *bookmarkService) Create(itemID int, userID int, comment string) (*model.Bookmark, error) {

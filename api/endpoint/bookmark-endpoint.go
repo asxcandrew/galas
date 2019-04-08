@@ -24,6 +24,11 @@ type ListBookmarksRequest struct {
 	Page int
 }
 
+type ListBookmarkResponse struct {
+	Bookmarks []*representation.BookmarkEntity `json:"bookmarks"`
+	Total     int                              `json:"total"`
+}
+
 func MakeListBookmarksEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ListBookmarksRequest)
@@ -33,13 +38,16 @@ func MakeListBookmarksEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 			return nil, err
 		}
 
-		bookmarks, err := s.List(claims.UserID, req.Page)
+		bookmarks, count, err := s.List(claims.UserID, req.Page)
 
 		resp := representation.Resp{
 			Err: err,
 		}
 		if err == nil {
-			resp.Data = representation.ConvertBookmarksListModelToEntity(bookmarks)
+			resp.Data = &ListBookmarkResponse{
+				Bookmarks: representation.ConvertBookmarksListModelToEntity(bookmarks),
+				Total:     count,
+			}
 		}
 		return resp, err
 	}

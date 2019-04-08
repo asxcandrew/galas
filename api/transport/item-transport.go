@@ -12,7 +12,6 @@ import (
 	"github.com/asxcandrew/galas/api/endpoint"
 	"github.com/asxcandrew/galas/item"
 	"github.com/asxcandrew/galas/workers"
-	gokitjwt "github.com/go-kit/kit/auth/jwt"
 	"github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
@@ -37,7 +36,7 @@ func MakeItemHandler(s item.ItemService, w workers.AuthWorker, logger log.Logger
 		w.NewJWTParser(endpoint.MakeCreateItemEndpoint(s)),
 		decodeCreateItemRequest,
 		encodeResponse,
-		append(opts, kithttp.ServerBefore(gokitjwt.HTTPToContext()))...,
+		append(opts, kithttp.ServerBefore(workers.HTTPToContext()))...,
 	)
 
 	r := mux.NewRouter()

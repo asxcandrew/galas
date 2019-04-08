@@ -20,21 +20,21 @@ func (r *BookmarkRepository) Create(b *model.Bookmark) error {
 	return wrapError(err)
 }
 
-func (r *BookmarkRepository) List(userID, page int) ([]*model.Bookmark, error) {
+func (r *BookmarkRepository) ListAndCount(userID, page int) ([]*model.Bookmark, int, error) {
 	var bookmarks []*model.Bookmark
 
 	q := r.db.Model(&bookmarks)
-	q.Where("user_id = ?", userID).Column("Item", "Item.Author")
+	q.Where("user_id = ?", userID).Order("id DESC").Column("Item", "Item.Author")
 
 	q, err := paginate(q, page)
 
 	if err != nil {
-		return bookmarks, wrapError(err)
+		return bookmarks, 0, wrapError(err)
 	}
 
-	err = q.Select()
+	count, err := q.SelectAndCount()
 
-	return bookmarks, wrapError(err)
+	return bookmarks, count, wrapError(err)
 }
 
 func (r *BookmarkRepository) Delete(ID int) error {
