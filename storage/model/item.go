@@ -31,16 +31,25 @@ type Item struct {
 }
 
 func (i *Item) Validate() error {
-	return validation.ValidateStruct(i,
-		validation.Field(&i.Title, validation.Required, validation.Length(5, 50)),
-		validation.Field(&i.HTMLBody, validation.Required),
-		validation.Field(&i.Type,
-			validation.Required,
-			validation.In(
-				ItemType_Story,
-				ItemType_Comment,
-				ItemType_Announcement,
-			),
+	var fieldRules []*validation.FieldRules
+
+	fieldRules = append(fieldRules, validation.Field(&i.HTMLBody, validation.Required))
+	fieldRules = append(fieldRules, validation.Field(&i.Type,
+		validation.Required,
+		validation.In(
+			ItemType_Story,
+			ItemType_Comment,
+			ItemType_Announcement,
 		),
-	)
+	))
+
+	if i.Type == ItemType_Story {
+		fieldRules = append(fieldRules, validation.Field(&i.Title, validation.Required, validation.Length(5, 50)))
+	}
+
+	if i.Type == ItemType_Comment {
+		fieldRules = append(fieldRules, validation.Field(&i.AncestorID, validation.Required))
+	}
+
+	return validation.ValidateStruct(i, fieldRules...)
 }

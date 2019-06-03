@@ -21,15 +21,16 @@ type ItemEntity struct {
 
 func ConvertItemModelToEntity(m *model.Item) *ItemEntity {
 	return &ItemEntity{
-		ID:        m.ID,
-		Link:      m.Link,
-		Author:    m.Author.Username,
-		HTMLBody:  m.HTMLBody,
-		Title:     m.Title,
-		Type:      m.Type,
-		Score:     m.Score,
-		Active:    m.Active,
-		CreatedAt: m.CreatedAt,
+		ID:         m.ID,
+		Link:       m.Link,
+		Author:     m.Author.Username,
+		HTMLBody:   m.HTMLBody,
+		AncestorID: m.AncestorID,
+		Title:      m.Title,
+		Type:       m.Type,
+		Score:      m.Score,
+		Active:     m.Active,
+		CreatedAt:  m.CreatedAt,
 	}
 }
 
