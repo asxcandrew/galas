@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/asxcandrew/galas/user"
+	"github.com/asxcandrew/galas/social/user"
 	"github.com/asxcandrew/galas/workers"
 
 	"github.com/asxcandrew/galas/api/endpoint"

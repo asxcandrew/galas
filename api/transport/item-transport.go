@@ -10,7 +10,7 @@ import (
 	"github.com/asxcandrew/galas/api/representation"
 
 	"github.com/asxcandrew/galas/api/endpoint"
-	"github.com/asxcandrew/galas/item"
+	"github.com/asxcandrew/galas/social/item"
 	"github.com/asxcandrew/galas/workers"
 	"github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"

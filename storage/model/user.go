@@ -21,6 +21,8 @@ type User struct {
 	Username          string
 	Role              string
 	Email             string
+	MediaID           int
+	Media             *Media
 	EncryptedPassword string
 	CreatedAt         time.Time
 	UpdatedAt         time.Time

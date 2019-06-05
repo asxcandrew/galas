@@ -10,11 +10,11 @@ import (
 	"github.com/asxcandrew/galas/workers"
 
 	"github.com/asxcandrew/galas/api/transport"
-	"github.com/asxcandrew/galas/bookmark"
 	"github.com/asxcandrew/galas/config"
-	"github.com/asxcandrew/galas/item"
+	"github.com/asxcandrew/galas/social/bookmark"
+	"github.com/asxcandrew/galas/social/item"
+	"github.com/asxcandrew/galas/social/user"
 	"github.com/asxcandrew/galas/storage"
-	"github.com/asxcandrew/galas/user"
 	"github.com/go-kit/kit/log"
 )
 

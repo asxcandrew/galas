@@ -7,7 +7,7 @@ import (
 	"github.com/asxcandrew/galas/storage/model"
 
 	"github.com/asxcandrew/galas/api/representation"
-	"github.com/asxcandrew/galas/item"
+	"github.com/asxcandrew/galas/social/item"
 	"github.com/asxcandrew/galas/workers"
 	"github.com/go-kit/kit/endpoint"
 )

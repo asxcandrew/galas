@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/asxcandrew/galas/social/user"
 	"github.com/asxcandrew/galas/storage/model"
-	"github.com/asxcandrew/galas/user"
 
 	"github.com/asxcandrew/galas/api/representation"
 	"github.com/asxcandrew/galas/workers"

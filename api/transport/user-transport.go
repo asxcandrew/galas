@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/asxcandrew/galas/api/endpoint"
-	"github.com/asxcandrew/galas/user"
+	"github.com/asxcandrew/galas/social/user"
 	"github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"

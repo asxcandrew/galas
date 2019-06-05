@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/asxcandrew/galas/api/representation"
-	"github.com/asxcandrew/galas/user"
+	"github.com/asxcandrew/galas/social/user"
 	"github.com/go-kit/kit/endpoint"
 )
 

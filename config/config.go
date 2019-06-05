@@ -7,8 +7,9 @@ import (
 )
 
 type galasConfiguration struct {
-	DB         *databaseConfiguration
-	SecretSeed string `required:"true"`
+	DB          *databaseConfiguration
+	FileStorage *fileStorageConfiguration
+	SecretSeed  string `required:"true"`
 }
 
 type databaseConfiguration struct {
@@ -17,6 +18,14 @@ type databaseConfiguration struct {
 	Name     string `required:"true"`
 	Password string `required:"true"`
 	User     string `required:"true"`
+}
+
+type fileStorageConfiguration struct {
+	Endpoint  string `required:"true"`
+	Path      string `required:"true"`
+	Bucket    string `required:"true"`
+	AccessKey string `split_words:"true" required:"true"`
+	SecretKey string `split_words:"true" required:"true"`
 }
 
 func ResolveConfig() (*galasConfiguration, error) {

@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/asxcandrew/galas/bookmark"
 	"github.com/asxcandrew/galas/faults"
+	"github.com/asxcandrew/galas/social/bookmark"
 
 	"github.com/asxcandrew/galas/api/endpoint"
 	"github.com/asxcandrew/galas/workers"

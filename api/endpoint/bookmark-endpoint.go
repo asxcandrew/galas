@@ -5,8 +5,8 @@ import (
 	"errors"
 
 	"github.com/asxcandrew/galas/api/representation"
-	"github.com/asxcandrew/galas/bookmark"
 	"github.com/asxcandrew/galas/faults"
+	"github.com/asxcandrew/galas/social/bookmark"
 	"github.com/asxcandrew/galas/workers"
 	"github.com/go-kit/kit/endpoint"
 )

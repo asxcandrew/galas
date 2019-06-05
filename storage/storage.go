@@ -10,6 +10,7 @@ type Storage struct {
 	Item     repository.ItemRepository
 	User     repository.UserRepository
 	Bookmark repository.BookmarkRepository
+	Media    repository.MediaRepository
 }
 
 func NewPGStorage(db *pg.DB) Storage {
@@ -17,5 +18,6 @@ func NewPGStorage(db *pg.DB) Storage {
 		Item:     pgrepository.NewPGItemRepository(db),
 		User:     pgrepository.NewPGUserRepository(db),
 		Bookmark: pgrepository.NewPGBookmarkRepository(db),
+		Media:    pgrepository.NewPGMediaRepository(db),
 	}
 }
