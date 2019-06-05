@@ -11,7 +11,7 @@ import (
 
 	"github.com/asxcandrew/galas/api/endpoint"
 	"github.com/asxcandrew/galas/social/item"
-	"github.com/asxcandrew/galas/workers"
+	"github.com/asxcandrew/galas/worker"
 	"github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
@@ -19,7 +19,7 @@ import (
 
 var errBadRoute = errors.New("Bad route")
 
-func MakeItemHandler(s item.ItemService, w workers.AuthWorker, logger log.Logger) http.Handler {
+func MakeItemHandler(s item.ItemService, w worker.AuthWorker, logger log.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerErrorEncoder(encodeError),
@@ -36,7 +36,7 @@ func MakeItemHandler(s item.ItemService, w workers.AuthWorker, logger log.Logger
 		w.NewJWTParser(endpoint.MakeCreateItemEndpoint(s)),
 		decodeCreateItemRequest,
 		encodeResponse,
-		append(opts, kithttp.ServerBefore(workers.HTTPToContext()))...,
+		append(opts, kithttp.ServerBefore(worker.HTTPToContext()))...,
 	)
 
 	r := mux.NewRouter()
@@ -47,7 +47,7 @@ func MakeItemHandler(s item.ItemService, w workers.AuthWorker, logger log.Logger
 	return r
 }
 
-func MakeFeedHandler(s item.ItemService, w workers.AuthWorker, logger log.Logger) http.Handler {
+func MakeFeedHandler(s item.ItemService, w worker.AuthWorker, logger log.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerErrorEncoder(encodeError),

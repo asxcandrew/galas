@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/asxcandrew/galas/workers"
+	"github.com/asxcandrew/galas/worker"
 
 	"github.com/asxcandrew/galas/api/transport"
 	"github.com/asxcandrew/galas/config"
@@ -41,6 +41,20 @@ func main() {
 		appConfig.DB.Name,
 	)
 
+	_, err = worker.NewObjectStorage(
+		&worker.ObjectStorageConfig{
+			Endpoint:  appConfig.FileStorage.Endpoint,
+			Bucket:    appConfig.FileStorage.Bucket,
+			Path:      appConfig.FileStorage.Path,
+			AccessKey: appConfig.FileStorage.AccessKey,
+			SecretKey: appConfig.FileStorage.SecretKey,
+		},
+	)
+
+	if err != nil {
+		errs <- err
+	}
+
 	st := storage.NewPGStorage(db)
 	us := user.NewUserService(st)
 	is := item.NewItemService(st)
@@ -50,7 +64,7 @@ func main() {
 	us = user.NewUserLoggingService(logger, us)
 	bs = bookmark.NewBookmarkLoggingService(logger, bs)
 
-	aw := workers.NewAuthWorker(appConfig.SecretSeed)
+	aw := worker.NewAuthWorker(appConfig.SecretSeed)
 
 	httpLogger := log.With(logger, "component", "http")
 	mux := http.NewServeMux()

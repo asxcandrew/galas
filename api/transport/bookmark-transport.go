@@ -11,17 +11,17 @@ import (
 	"github.com/asxcandrew/galas/social/bookmark"
 
 	"github.com/asxcandrew/galas/api/endpoint"
-	"github.com/asxcandrew/galas/workers"
+	"github.com/asxcandrew/galas/worker"
 	"github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 )
 
-func MakeBookmarkHandler(s bookmark.BookmarkService, w workers.AuthWorker, logger log.Logger) http.Handler {
+func MakeBookmarkHandler(s bookmark.BookmarkService, w worker.AuthWorker, logger log.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerErrorEncoder(encodeError),
-		kithttp.ServerBefore(workers.HTTPToContext()),
+		kithttp.ServerBefore(worker.HTTPToContext()),
 	}
 
 	listBookmarksHandler := kithttp.NewServer(

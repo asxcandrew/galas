@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/asxcandrew/galas/social/user"
-	"github.com/asxcandrew/galas/workers"
+	"github.com/asxcandrew/galas/worker"
 
 	"github.com/asxcandrew/galas/api/endpoint"
 	"github.com/go-kit/kit/log"
@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func MakeAuthHandler(s user.UserService, w workers.AuthWorker, logger log.Logger) http.Handler {
+func MakeAuthHandler(s user.UserService, w worker.AuthWorker, logger log.Logger) http.Handler {
 	opts := []kithttp.ServerOption{
 		kithttp.ServerErrorLogger(logger),
 		kithttp.ServerErrorEncoder(encodeError),

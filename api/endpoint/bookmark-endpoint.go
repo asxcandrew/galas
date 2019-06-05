@@ -7,7 +7,7 @@ import (
 	"github.com/asxcandrew/galas/api/representation"
 	"github.com/asxcandrew/galas/faults"
 	"github.com/asxcandrew/galas/social/bookmark"
-	"github.com/asxcandrew/galas/workers"
+	"github.com/asxcandrew/galas/worker"
 	"github.com/go-kit/kit/endpoint"
 )
 
@@ -32,7 +32,7 @@ type ListBookmarkResponse struct {
 func MakeListBookmarksEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(ListBookmarksRequest)
-		claims, err := workers.GetClaims(ctx)
+		claims, err := worker.GetClaims(ctx)
 
 		if err != nil {
 			return nil, err
@@ -56,7 +56,7 @@ func MakeListBookmarksEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 func MakeCreateBookmarkEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 
-		claims, err := workers.GetClaims(ctx)
+		claims, err := worker.GetClaims(ctx)
 
 		if err != nil {
 			return nil, err
@@ -78,7 +78,7 @@ func MakeCreateBookmarkEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 func MakeDeleteBookmarkEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 
-		claims, err := workers.GetClaims(ctx)
+		claims, err := worker.GetClaims(ctx)
 
 		if err != nil {
 			return nil, err

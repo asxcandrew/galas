@@ -8,7 +8,7 @@ import (
 	"github.com/asxcandrew/galas/storage/model"
 
 	"github.com/asxcandrew/galas/api/representation"
-	"github.com/asxcandrew/galas/workers"
+	"github.com/asxcandrew/galas/worker"
 	"github.com/go-kit/kit/endpoint"
 )
 
@@ -29,7 +29,7 @@ type AuthResponse struct {
 	Expire string                     `json:"expire"`
 }
 
-func MakeLoginEndpoint(w workers.AuthWorker, s user.UserService) endpoint.Endpoint {
+func MakeLoginEndpoint(w worker.AuthWorker, s user.UserService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(LoginRequest)
 		user, err := s.Login(req.Email, req.Password)
@@ -38,7 +38,7 @@ func MakeLoginEndpoint(w workers.AuthWorker, s user.UserService) endpoint.Endpoi
 			return nil, nil
 		}
 
-		token, expire, err := w.GenerateToken(user)
+		token, expire, err := w.GenerateToken(user.ID, user.Role)
 
 		resp := representation.Resp{
 			Err: err,
@@ -50,7 +50,7 @@ func MakeLoginEndpoint(w workers.AuthWorker, s user.UserService) endpoint.Endpoi
 	}
 }
 
-func MakeRegisterEndpoint(w workers.AuthWorker, s user.UserService) endpoint.Endpoint {
+func MakeRegisterEndpoint(w worker.AuthWorker, s user.UserService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(RegisterRequest)
 		user := &model.User{
@@ -64,7 +64,7 @@ func MakeRegisterEndpoint(w workers.AuthWorker, s user.UserService) endpoint.End
 			return nil, nil
 		}
 
-		token, expire, err := w.GenerateToken(user)
+		token, expire, err := w.GenerateToken(user.ID, user.Role)
 
 		resp := representation.Resp{
 			Err: err,

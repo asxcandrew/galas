@@ -5,10 +5,10 @@ import (
 	"errors"
 
 	"github.com/asxcandrew/galas/storage/model"
+	"github.com/asxcandrew/galas/worker"
 
 	"github.com/asxcandrew/galas/api/representation"
 	"github.com/asxcandrew/galas/social/item"
-	"github.com/asxcandrew/galas/workers"
 	"github.com/go-kit/kit/endpoint"
 )
 
@@ -72,7 +72,7 @@ func MakeShowItemEndpoint(s item.ItemService) endpoint.Endpoint {
 func MakeCreateItemEndpoint(s item.ItemService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 
-		claims, err := workers.GetClaims(ctx)
+		claims, err := worker.GetClaims(ctx)
 
 		if err != nil {
 			return nil, err

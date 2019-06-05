@@ -1,4 +1,4 @@
-package workers
+package worker
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 
 	"github.com/asxcandrew/galas/faults"
 
-	"github.com/asxcandrew/galas/storage/model"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/go-kit/kit/endpoint"
 )
@@ -15,7 +14,7 @@ import (
 const TokenTTL = time.Hour * 750
 
 type AuthWorker interface {
-	GenerateToken(*model.User) (string, time.Time, error)
+	GenerateToken(int, string) (string, time.Time, error)
 	NewJWTParser(e endpoint.Endpoint) endpoint.Endpoint
 }
 
@@ -47,12 +46,12 @@ func (w *authWorker) NewJWTParser(e endpoint.Endpoint) endpoint.Endpoint {
 }
 
 // GenerateToken generates token with expiration date for a given user
-func (w *authWorker) GenerateToken(user *model.User) (string, time.Time, error) {
+func (w *authWorker) GenerateToken(id int, role string) (string, time.Time, error) {
 	expiration := time.Now().Add(TokenTTL)
 
 	claims := CustomClaims{
-		user.ID,
-		user.Role,
+		id,
+		role,
 		jwt.StandardClaims{
 			ExpiresAt: expiration.Unix(),
 			IssuedAt:  jwt.TimeFunc().Unix(),
