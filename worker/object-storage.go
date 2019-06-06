@@ -20,6 +20,7 @@ type ObjectStorageConfig struct {
 	Bucket    string
 	AccessKey string
 	SecretKey string
+	UseSSL    bool
 }
 
 type ObjectStorage interface {
@@ -33,7 +34,7 @@ func NewObjectStorage(c *ObjectStorageConfig) (ObjectStorage, error) {
 		c.Endpoint,
 		c.AccessKey,
 		c.SecretKey,
-		true,
+		c.UseSSL,
 	)
 
 	if err != nil {
@@ -43,7 +44,7 @@ func NewObjectStorage(c *ObjectStorageConfig) (ObjectStorage, error) {
 	exists, err := minioClient.BucketExists(c.Bucket)
 
 	if err != nil || !exists {
-		return nil, errors.New("Bucket does not exist")
+		return nil, errors.New("Object storage: Bucket does not exist")
 	}
 	return &objectStorage{
 		client: minioClient,

@@ -26,6 +26,7 @@ type fileStorageConfiguration struct {
 	Bucket    string `required:"true"`
 	AccessKey string `split_words:"true" required:"true"`
 	SecretKey string `split_words:"true" required:"true"`
+	UseSSL    bool   `default:"true"`
 }
 
 func ResolveConfig() (*galasConfiguration, error) {
