@@ -13,6 +13,7 @@ import (
 	"github.com/asxcandrew/galas/config"
 	"github.com/asxcandrew/galas/social/bookmark"
 	"github.com/asxcandrew/galas/social/item"
+	"github.com/asxcandrew/galas/social/media"
 	"github.com/asxcandrew/galas/social/user"
 	"github.com/asxcandrew/galas/storage"
 	"github.com/go-kit/kit/log"
@@ -41,7 +42,7 @@ func main() {
 		appConfig.DB.Name,
 	)
 
-	_, err = worker.NewObjectStorage(
+	objStorage, err := worker.NewObjectStorage(
 		&worker.ObjectStorageConfig{
 			Endpoint:  appConfig.FileStorage.Endpoint,
 			Bucket:    appConfig.FileStorage.Bucket,
@@ -59,6 +60,7 @@ func main() {
 	us := user.NewUserService(st)
 	is := item.NewItemService(st)
 	bs := bookmark.NewBookmarkService(st)
+	ms := media.NewMediaService(st, objStorage)
 
 	is = item.NewItemLoggingService(logger, is)
 	us = user.NewUserLoggingService(logger, us)
@@ -72,6 +74,7 @@ func main() {
 	mux.Handle("/api/v1/users/", transport.MakeUserHandler(us, httpLogger))
 	mux.Handle("/api/v1/items/", transport.MakeItemHandler(is, aw, httpLogger))
 	mux.Handle("/api/v1/bookmarks/", transport.MakeBookmarkHandler(bs, aw, httpLogger))
+	mux.Handle("/api/v1/media/", transport.MakeMediaHandler(ms, httpLogger))
 	mux.Handle("/api/v1/feed/", transport.MakeFeedHandler(is, aw, httpLogger))
 	mux.Handle("/api/v1/auth/", transport.MakeAuthHandler(us, aw, httpLogger))
 

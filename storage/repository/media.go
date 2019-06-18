@@ -6,5 +6,6 @@ import (
 
 type MediaRepository interface {
 	GetByID(int) (*model.Media, error)
+	Delete(string) error
 	Create(*model.Media) error
 }

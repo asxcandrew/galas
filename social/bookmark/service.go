@@ -6,10 +6,10 @@ import (
 )
 
 type BookmarkService interface {
-	List(int, int) ([]*model.Bookmark, int, error)
+	List(int, int) ([]*model.Bookmark, int, int, error)
 	Create(int, int, string) (*model.Bookmark, error)
 	Delete(int) error
-	GetByID(int) (*model.Bookmark, error)
+	GetByItemID(int) (*model.Bookmark, error)
 }
 
 type bookmarkService struct {
@@ -23,10 +23,10 @@ func NewBookmarkService(storage storage.Storage) BookmarkService {
 	}
 }
 
-func (s *bookmarkService) List(userID, page int) ([]*model.Bookmark, int, error) {
+func (s *bookmarkService) List(userID, page int) ([]*model.Bookmark, int, int, error) {
 	bookmarks, count, err := s.storage.Bookmark.ListAndCount(userID, page)
 
-	return bookmarks, count, err
+	return bookmarks, count, s.storage.Bookmark.PerPage(), err
 }
 
 func (s *bookmarkService) Create(itemID int, userID int, comment string) (*model.Bookmark, error) {
@@ -58,8 +58,8 @@ func (s *bookmarkService) Delete(bookmarkID int) error {
 	return err
 }
 
-func (s *bookmarkService) GetByID(bookmarkID int) (*model.Bookmark, error) {
-	b, err := s.storage.Bookmark.GetByID(bookmarkID)
+func (s *bookmarkService) GetByItemID(itemID int) (*model.Bookmark, error) {
+	b, err := s.storage.Bookmark.GetByItemID(itemID)
 
 	return b, err
 }

@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	PerPage = 10
+	perPage = 10
 )
 
 func newPager(page int) *urlvalues.Pager {
 	p := urlvalues.Pager{
-		Limit: PerPage,
+		Limit: perPage,
 	}
 
 	p.SetPage(page)

@@ -2,6 +2,7 @@ package worker
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -40,6 +41,8 @@ func NewObjectStorage(c *ObjectStorageConfig) (ObjectStorage, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(minioClient.ListBuckets())
 
 	exists, err := minioClient.BucketExists(c.Bucket)
 

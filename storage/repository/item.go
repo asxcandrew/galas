@@ -9,4 +9,5 @@ type ItemRepository interface {
 	GetNewStories(int) ([]*model.Item, error)
 	GetTopStories(int) ([]*model.Item, error)
 	Create(*model.Item) error
+	PerPage() int
 }

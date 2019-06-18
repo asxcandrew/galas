@@ -19,6 +19,10 @@ func (r *MediaRepository) Create(m *model.Media) error {
 	return create(r.db, m)
 }
 
+func (r *MediaRepository) Delete(uuid string) error {
+	return nil
+}
+
 func (r *MediaRepository) GetByID(id int) (*model.Media, error) {
 	m := &model.Media{ID: id}
 	err := r.db.Select(m)

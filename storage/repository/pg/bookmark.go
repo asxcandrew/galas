@@ -44,9 +44,13 @@ func (r *BookmarkRepository) Delete(ID int) error {
 	return wrapError(err)
 }
 
-func (r *BookmarkRepository) GetByID(ID int) (*model.Bookmark, error) {
+func (r *BookmarkRepository) GetByItemID(ItemID int) (*model.Bookmark, error) {
 	b := &model.Bookmark{}
-	err := r.db.Model(b).Where("bookmark.id = ?", ID).Column("Item").Select()
+	err := r.db.Model(b).Where("bookmark.item_id = ?", ItemID).Column("Item").Select()
 
 	return b, wrapError(err)
+}
+
+func (r *BookmarkRepository) PerPage() int {
+	return perPage
 }

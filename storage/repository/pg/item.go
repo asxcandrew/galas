@@ -65,3 +65,7 @@ func (r *ItemRepository) Create(item *model.Item) (err error) {
 func (r *ItemRepository) activeItemsQuery(q *orm.Query) *orm.Query {
 	return q.Where("active = ?", true).Column("Author").Order("created_at ASC")
 }
+
+func (r *ItemRepository) PerPage() int {
+	return perPage
+}

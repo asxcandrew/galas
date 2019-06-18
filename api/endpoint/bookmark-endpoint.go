@@ -27,6 +27,7 @@ type ListBookmarksRequest struct {
 type ListBookmarkResponse struct {
 	Bookmarks []*representation.BookmarkEntity `json:"bookmarks"`
 	Total     int                              `json:"total"`
+	PerPage   int                              `json:"per_page"`
 }
 
 func MakeListBookmarksEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
@@ -38,7 +39,7 @@ func MakeListBookmarksEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 			return nil, err
 		}
 
-		bookmarks, count, err := s.List(claims.UserID, req.Page)
+		bookmarks, count, perPage, err := s.List(claims.UserID, req.Page)
 
 		resp := representation.Resp{
 			Err: err,
@@ -47,6 +48,7 @@ func MakeListBookmarksEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 			resp.Data = &ListBookmarkResponse{
 				Bookmarks: representation.ConvertBookmarksListModelToEntity(bookmarks),
 				Total:     count,
+				PerPage:   perPage,
 			}
 		}
 		return resp, err
@@ -85,7 +87,7 @@ func MakeDeleteBookmarkEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 		}
 
 		req := request.(DeleteBookmarkRequest)
-		bookmark, err := s.GetByID(req.ID)
+		bookmark, err := s.GetByItemID(req.ID)
 
 		if err != nil {
 			return nil, err
@@ -94,7 +96,7 @@ func MakeDeleteBookmarkEndpoint(s bookmark.BookmarkService) endpoint.Endpoint {
 		if bookmark.UserID != claims.UserID {
 			return nil, faults.BuildRichError(faults.ForbiddenError, errors.New("User is forbidden to delete bookmark"))
 		}
-		err = s.Delete(req.ID)
+		err = s.Delete(bookmark.ID)
 
 		resp := representation.Resp{
 			Err: err,

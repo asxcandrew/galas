@@ -5,6 +5,8 @@ services:
     build:
       context: .
     restart: on-failure
+    depends_on:
+      - minio
     ports:
       - 8080:8000
     networks:
