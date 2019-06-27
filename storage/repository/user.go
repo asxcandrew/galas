@@ -6,6 +6,7 @@ import (
 
 type UserRepository interface {
 	Create(*model.User) error
+	Update(*model.User) error
 	GetByEmail(string) (*model.User, error)
 	GetByUsername(string) (*model.User, error)
 }

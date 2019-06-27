@@ -3,6 +3,7 @@ package worker
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/asxcandrew/galas/faults"
@@ -14,7 +15,7 @@ import (
 const TokenTTL = time.Hour * 750
 
 type AuthWorker interface {
-	GenerateToken(int, string) (string, time.Time, error)
+	GenerateToken(int, string, string) (string, time.Time, error)
 	NewJWTParser(e endpoint.Endpoint) endpoint.Endpoint
 }
 
@@ -24,6 +25,7 @@ type authWorker struct {
 
 type CustomClaims struct {
 	UserID   int    `json:"user_id"`
+	UserName string `json:"username"`
 	UserRole string `json:"user_role"`
 	jwt.StandardClaims
 }
@@ -46,11 +48,12 @@ func (w *authWorker) NewJWTParser(e endpoint.Endpoint) endpoint.Endpoint {
 }
 
 // GenerateToken generates token with expiration date for a given user
-func (w *authWorker) GenerateToken(id int, role string) (string, time.Time, error) {
+func (w *authWorker) GenerateToken(id int, username, role string) (string, time.Time, error) {
 	expiration := time.Now().Add(TokenTTL)
 
 	claims := CustomClaims{
 		id,
+		username,
 		role,
 		jwt.StandardClaims{
 			ExpiresAt: expiration.Unix(),
@@ -65,6 +68,8 @@ func (w *authWorker) GenerateToken(id int, role string) (string, time.Time, erro
 }
 
 func GetClaims(c context.Context) (*CustomClaims, error) {
+	fmt.Println("GetClaims")
+	fmt.Println(c.Value(JWTClaimsContextKey))
 	if claims, ok := c.Value(JWTClaimsContextKey).(*CustomClaims); !ok {
 		return nil, faults.BuildRichError(faults.UnauthorisedError, errors.New("Can`t extract claims"))
 	} else {

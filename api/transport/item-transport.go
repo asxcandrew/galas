@@ -41,8 +41,8 @@ func MakeItemHandler(s item.ItemService, w worker.AuthWorker, logger log.Logger)
 
 	r := mux.NewRouter()
 
-	r.Handle("/api/v1/items/{id}", showItemHandler).Methods("GET")
-	r.Handle("/api/v1/items/", createItemHandler).Methods("POST")
+	r.Handle("/api/v1/items/{id:[0-9]}", showItemHandler).Methods("GET")
+	r.Handle("/api/v1/items", createItemHandler).Methods("POST")
 
 	return r
 }

@@ -47,9 +47,9 @@ func MakeBookmarkHandler(s bookmark.BookmarkService, w worker.AuthWorker, logger
 
 	r := mux.NewRouter()
 
-	r.Handle("/api/v1/bookmarks/", listBookmarksHandler).Methods("GET")
-	r.Handle("/api/v1/bookmarks/", createBookmarkHandler).Methods("POST")
-	r.Handle("/api/v1/bookmarks/{id}", deleteBookmarkHandler).Methods("DELETE")
+	r.Handle("/api/v1/bookmarks", listBookmarksHandler).Methods("GET")
+	r.Handle("/api/v1/bookmarks", createBookmarkHandler).Methods("POST")
+	r.Handle("/api/v1/bookmarks/{id:[0-9]}", deleteBookmarkHandler).Methods("DELETE")
 
 	return r
 }

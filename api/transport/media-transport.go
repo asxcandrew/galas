@@ -42,7 +42,7 @@ func MakeMediaHandler(s media.MediaService, logger log.Logger) http.Handler {
 	r := mux.NewRouter()
 
 	r.Handle("/api/v1/media/{uuid}", getMediaHandler).Methods("GET")
-	r.Handle("/api/v1/media/", createMediaHandler).Methods("POST")
+	r.Handle("/api/v1/media", createMediaHandler).Methods("POST")
 	r.Handle("/api/v1/media/{uuid}", deleteMediaHandler).Methods("DELETE")
 
 	return r

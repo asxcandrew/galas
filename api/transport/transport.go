@@ -33,6 +33,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusNotFound)
 	case faults.ForbiddenError:
 		w.WriteHeader(http.StatusForbidden)
+	case faults.UnauthorisedError:
+		w.WriteHeader(http.StatusUnauthorized)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 	}

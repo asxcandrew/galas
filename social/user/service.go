@@ -8,6 +8,7 @@ import (
 
 type UserService interface {
 	Get(string) (*model.User, error)
+	Update(*model.User) error
 	Login(string, string) (*model.User, error)
 	Register(*model.User, string) error
 }
@@ -27,6 +28,12 @@ func (s *userService) Get(username string) (user *model.User, err error) {
 	user, err = s.storage.User.GetByUsername(username)
 
 	return user, err
+}
+
+func (s *userService) Update(user *model.User) (err error) {
+	err = s.storage.User.Update(user)
+
+	return err
 }
 
 func (s *userService) Login(email, password string) (user *model.User, err error) {

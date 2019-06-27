@@ -28,12 +28,13 @@ services:
     volumes:
       - ./dev/minio:/export
     ports:
-      - 9001:9000
+      - 9000:9000
     networks:
       - localnet
     environment:
       MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
       MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      MINIO_HTTP_TRACE: /tmp/minio.log
     command: server /export
   # createbuckets:
   #   image: minio/mc

@@ -38,7 +38,7 @@ func MakeLoginEndpoint(w worker.AuthWorker, s user.UserService) endpoint.Endpoin
 			return nil, nil
 		}
 
-		token, expire, err := w.GenerateToken(user.ID, user.Role)
+		token, expire, err := w.GenerateToken(user.ID, user.Username, user.Role)
 
 		resp := representation.Resp{
 			Err: err,
@@ -64,7 +64,7 @@ func MakeRegisterEndpoint(w worker.AuthWorker, s user.UserService) endpoint.Endp
 			return nil, nil
 		}
 
-		token, expire, err := w.GenerateToken(user.ID, user.Role)
+		token, expire, err := w.GenerateToken(user.ID, user.Username, user.Role)
 
 		resp := representation.Resp{
 			Err: err,

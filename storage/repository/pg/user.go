@@ -19,6 +19,12 @@ func (r *UserRepository) Create(user *model.User) error {
 	return create(r.db, user)
 }
 
+func (r *UserRepository) Update(user *model.User) error {
+	_, err := r.db.Model(user).WherePK().UpdateNotNull()
+
+	return err
+}
+
 func (r *UserRepository) GetByEmail(email string) (*model.User, error) {
 	user := &model.User{}
 	err := r.db.Model(user).Where("email = ?", email).Select()
