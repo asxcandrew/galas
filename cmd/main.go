@@ -1,11 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"flag"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/asxcandrew/galas/worker"
 
@@ -17,13 +19,22 @@ import (
 	"github.com/asxcandrew/galas/social/user"
 	"github.com/asxcandrew/galas/storage"
 	"github.com/go-kit/kit/log"
+	"github.com/gorilla/mux"
 )
 
+var logger log.Logger
+
 func main() {
-	var logger log.Logger
+	var wait time.Duration
+
+	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
+	flag.Parse()
+
 	var httpAddr = ":8000"
 
 	errs := make(chan error, 1)
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	logger = log.With(logger, "galas", log.DefaultTimestampUTC)
@@ -41,6 +52,8 @@ func main() {
 		appConfig.DB.Password,
 		appConfig.DB.Name,
 	)
+
+	defer db.Close()
 
 	objStorage, err := worker.NewObjectStorage(
 		&worker.ObjectStorageConfig{
@@ -69,30 +82,47 @@ func main() {
 	aw := worker.NewAuthWorker(appConfig.SecretSeed)
 
 	httpLogger := log.With(logger, "component", "http")
-	mux := http.NewServeMux()
 
-	mux.Handle("/api/v1/users/", transport.MakeUserHandler(us, httpLogger))
-	mux.Handle("/api/v1/items/", transport.MakeItemHandler(is, aw, httpLogger))
-	mux.Handle("/api/v1/bookmarks/", transport.MakeBookmarkHandler(bs, aw, httpLogger))
-	mux.Handle("/api/v1/media/", transport.MakeMediaHandler(ms, httpLogger))
-	mux.Handle("/api/v1/feed/", transport.MakeFeedHandler(is, aw, httpLogger))
-	mux.Handle("/api/v1/auth/", transport.MakeAuthHandler(us, aw, httpLogger))
+	routes := mux.NewRouter()
+	api := routes.PathPrefix("/api/v1").Subrouter()
 
-	http.Handle("/", mux)
+	api.PathPrefix("/users").Handler(transport.MakeUserHandler(us, aw, httpLogger))
+	api.PathPrefix("/items").Handler(transport.MakeItemHandler(is, aw, httpLogger))
+	api.PathPrefix("/bookmarks").Handler(transport.MakeBookmarkHandler(bs, aw, httpLogger))
+	api.PathPrefix("/media").Handler(transport.MakeMediaHandler(ms, httpLogger))
+	api.PathPrefix("/feed").Handler(transport.MakeFeedHandler(is, aw, httpLogger))
+	api.PathPrefix("/auth").Handler(transport.MakeAuthHandler(us, aw, httpLogger))
+
+	srv := &http.Server{
+		Addr:         httpAddr,
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:      routes,
+	}
 
 	go func() {
 		logger.Log("transport", "http", "address", httpAddr, "msg", "listening")
-		errs <- http.ListenAndServe(httpAddr, mux)
-	}()
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT)
-		errs <- fmt.Errorf("%s", <-c)
+
+		errs <- srv.ListenAndServe()
 	}()
 
-	logger.Log("terminated", <-errs)
+	select {
+	case <-c:
+		shutdown(srv, wait)
+	case <-errs:
+		shutdown(srv, wait)
+	}
+}
 
-	defer func() {
-		db.Close()
-	}()
+func shutdown(srv *http.Server, wait time.Duration) {
+	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+
+	srv.Shutdown(ctx)
+	// Optionally, you could run srv.Shutdown in a goroutine and block on
+	// <-ctx.Done() if your application should wait for other services
+	// to finalize based on context cancellation.
+	logger.Log("transport", "shutting down...")
+	os.Exit(0)
 }
