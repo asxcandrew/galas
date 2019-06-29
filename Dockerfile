@@ -14,7 +14,14 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/galas cmd/main.go
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/migrate migrations/*.go
 
 # final stage
-FROM alpine:3.8
+FROM alpine:3.10
+
+RUN apk update \
+        && apk upgrade \
+        && apk add --no-cache \
+        ca-certificates \
+        && update-ca-certificates 2>/dev/null || true
+
 COPY --from=builder /go/src/github.com/asxcandrew/galas/build/galas /app/
 COPY --from=builder /go/src/github.com/asxcandrew/galas/build/migrate /app/
 
